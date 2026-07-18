@@ -1,0 +1,310 @@
+<!DOCTYPE html>
+<html lang="fr">
+
+    <head>
+
+        <meta charset="UTF-8">
+        <meta name="viewport" content="width=device-width, initial-scale=1.0">
+        <title>Panier | SportShoes</title>
+        <link rel="stylesheet" href="style.css">
+        <style>
+                body{
+
+            background:#f5f5f5;
+            font-family:Arial, Helvetica, sans-serif;
+
+            }
+
+            .panier{
+
+                width:85%;
+                margin:40px auto;
+
+            }
+
+            .panier h1{
+
+                font-size:45px;
+                color:#555;
+                margin-bottom:30px;
+
+            }
+
+            .carte-panier{
+
+                background:white;
+                border-radius:20px;
+                padding:35px;
+                box-shadow:0 5px 20px rgba(0,0,0,0.15);
+
+            }
+
+            .article{
+
+                display:flex;
+                align-items:center;
+                justify-content:space-between;
+                gap:25px;
+                padding:25px 0;
+                border-bottom:1px solid #ddd;
+
+            }
+
+            .article:last-child{
+
+                border-bottom:none;
+
+            }
+
+            .article img{
+
+                width:180px;
+                height:180px;
+                object-fit:contain;
+
+            }
+
+            .info{
+
+                flex:1;
+
+            }
+
+            .info h3{
+
+                font-size:28px;
+                margin-bottom:15px;
+                color:#222;
+
+            }
+
+            .info p{
+
+                font-size:18px;
+                color:#666;
+                margin:8px 0;
+
+            }
+
+            .info a{
+
+                color:orangered;
+                text-decoration:none;
+                font-weight:bold;
+
+            }
+
+            .info a:hover{
+
+                text-decoration:underline;
+
+            }
+
+            .prix{
+
+                font-size:32px;
+                color:rgb(255, 119, 0);
+                font-weight:bold;
+
+            }
+
+            .resume{
+
+                margin-top:35px;
+                display:flex;
+                justify-content:space-between;
+                align-items:center;
+                flex-wrap:wrap;
+
+            }
+
+            #total{
+
+                font-size:35px;
+                color:#222;
+
+            }
+
+            #confirmer{
+
+                background:rgb(255, 115, 0);
+                color:white;
+                border:none;
+                border-radius:30px;
+                padding:15px 35px;
+                font-size:18px;
+                cursor:pointer;
+                margin-top:15px;
+                margin-right:10px;
+
+            }
+
+            #confirmer:hover{
+
+                background:#e65000;
+
+            }
+
+            #vider-panier{
+
+                background:#0b172dfb;
+                color:white;
+                border:none;
+                border-radius:30px;
+                padding:15px 35px;
+                font-size:18px;
+                cursor:pointer;
+                margin-top:15px;
+
+            }
+
+            #vider-panier:hover{
+
+                background:#222;
+
+            }
+
+            @media(max-width:768px){
+
+                .article{
+
+                    flex-direction:column;
+                    text-align:center;
+
+                }
+
+                .article img{
+
+                    width:140px;
+                    height:140px;
+
+                }
+
+                .resume{
+
+                    flex-direction:column;
+                    text-align:center;
+
+                }
+
+                #confirmer,
+                #vider-panier{
+
+                    width:100%;
+
+                }
+
+            }
+
+        </style>
+
+
+    </head>
+
+    <body>
+
+        <header>
+
+            <div class="logo">
+                <h1>Sport<span>Shoes</span></h1>
+            </div>
+
+            <nav>
+                <a href="acceuil.html">Accueil</a>
+                <a href="boutique.html">Boutique</a>
+                <a href="panier.html" class="active">Panier</a>
+                <a href="contact.html">Contact</a>
+            </nav>
+
+        </header>
+
+        <main class="panier">
+            <h1>Votre panier</h1>
+            <div class="carte-panier">
+                <div id="liste-panier">
+                </div>
+
+                <hr>
+
+                <div class="resume">
+                    <h2 id="total">Total : 0 $</h2>
+                    <button id="confirmer">
+                        Confirmer la commande
+                    </button>
+                    <button id="vider-panier">
+                        Vider le panier
+                    </button>
+                </div>
+            </div>
+
+        </main>
+        <footer class="site-footer">
+            <p>&copy; 2026 SportShoes - Tous droits réservés.</p>
+        </footer>
+
+        <script>
+            let panier = JSON.parse(localStorage.getItem("panier")) || [];
+            console.log(panier);
+
+            let listePanier = document.getElementById("liste-panier");
+            let total = document.getElementById("total");
+            let viderPanier = document.getElementById("vider-panier");
+
+            function afficherPanier(){
+                listePanier.innerHTML = "";
+                let somme = 0;
+
+                if(panier.length === 0){
+                    listePanier.innerHTML = `
+                    <div class="vide">
+                        <h2>Votre panier est vide.</h2>
+                        <p>Ajoutez des produits depuis la boutique.</p>
+                    </div>
+                    `;
+                    total.textContent = "Total : 0 $";
+                    return;
+                }
+
+                panier.forEach(function(produit,index){
+                    // ✅ Correction du calcul du prix
+                    somme += Number(produit.price.replace("$",""));
+
+                    listePanier.innerHTML += `
+                    <div class="article">
+                        <img src="${produit.image}" alt="${produit.name}">
+                        <div class="info">
+                            <h3>${produit.name}</h3>
+                            <p>Pointure : ${produit.taille}</p>
+                            <p>Quantité : 1</p>
+                            <a href="#" onclick="supprimerProduit(${index}); return false;">
+                                Retirer
+                            </a>
+                        </div>
+                        <h2 class="prix">
+                            ${produit.price}
+                        </h2>
+                    </div>
+                    `;
+                });
+                total.textContent = "Total : $" + somme;
+            }
+
+            function supprimerProduit(index){
+                panier.splice(index,1);
+                localStorage.setItem("panier",JSON.stringify(panier));
+                afficherPanier();
+            }
+
+            viderPanier.addEventListener("click",function(){
+                panier = [];
+                localStorage.setItem("panier",JSON.stringify(panier));
+                afficherPanier();
+            });
+
+            afficherPanier();
+        </script>
+
+
+    </body>
+
+</html>
